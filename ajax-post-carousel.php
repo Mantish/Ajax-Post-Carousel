@@ -3,7 +3,7 @@
 Plugin Name: Ajax Post Carousel
 Plugin URI: http://
 Description: Widget that displays posts as a carousel using jQuery for animations. The widget only preloads a few posts and Ajax is used to load more as the carousel advances (this is very useful when you have hundreds of posts).
-Version: 1.0
+Version: 0.2.2
 Author: Mauricio Mantilla - 8manos
 Author URI: http://codigoweb.co
 */
@@ -54,7 +54,9 @@ class Ajax_Post_Carousel extends WP_Widget{
 					}
 				}
 				//if post type and category, then added to the args of get_post function 
-				if ($post_type != 'all'){
+				if ($post_type == 'all'){
+					$get_posts_args['post_type'] = 'any';
+				}else{
 					$get_posts_args['post_type'] = $post_type;
 				}
 				if ($category != 'all'){
@@ -136,7 +138,7 @@ class Ajax_Post_Carousel extends WP_Widget{
 	
 	function __display_items($posts, $show_title){
 		foreach ($posts as $post){
-			echo '<li class="apc_item"><a title="'.$post->post_title.'" href="'.get_permalink($post->ID).'" class="apc_post_link" />';
+			echo '<li class="apc_item"><a title="'.$post->post_title.'" href="'.get_permalink($post->ID).'" class="apc_post_link">';
 			if ( $show_title ){
 				echo '<h5>'.$post->post_title.'</h5>';
 			}
@@ -247,7 +249,9 @@ class Ajax_Post_Carousel extends WP_Widget{
 			'numberposts' => $_POST['num'],
 			'offset' => $_POST['offset']
 		);
-		if ($_POST['post_type'] != 'all'){
+		if ($_POST['post_type'] == 'all'){
+			$get_posts_args['post_type'] = 'any';
+		}else{
 			$get_posts_args['post_type'] = $_POST['post_type'];
 		}
 		if ($_POST['category'] != 'all'){
