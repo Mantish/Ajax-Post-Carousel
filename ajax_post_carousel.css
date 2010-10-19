@@ -1,0 +1,12 @@
+.apc_out_container{position:relative; padding:0 20px;}
+.apc_visible_container{overflow:hidden; position:relative;}
+.apc_list{overflow:hidden; position:relative;}
+.apc_item{list-style:none; float:left;}
+.apc_thumb{vertical-align:top;}
+
+.apc_arrow{cursor:pointer; position:absolute; top:10px;}
+.apc_prev{left:5px;}
+.apc_next{right:5px;}
+.apc_active{display:block;}
+.apc_inactive{display:none;}
+.apc_ajax{display:block; text-indent:-9999px; background:url(ajax-arrow.gif) no-repeat 0 0; width:16px;}
