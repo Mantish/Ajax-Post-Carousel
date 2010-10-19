@@ -14,9 +14,9 @@ With Ajax Post Carousel you can display posts as a carousel using jQuery for ani
 The featured thumbnail of each post is used for the carousel, so at least Wordpress 2.9 is required. The widget can be totally customized using CSS. Only the basic styles are defined so the carousel works properly.
 
 **Features**
-*Posts can be selected from a category, a custom taxonomy or a post type.
-*Number of posts in carousel and number of preloaded posts (buffered posts)
-*Posts can be loaded in radom order or using the deafault order (From most recent to oldest)
+* Posts can be selected from a category, a custom taxonomy or a post type.
+* Number of posts in carousel and number of preloaded posts (buffered posts)
+* Posts can be loaded in radom order or using the deafault order (From most recent to oldest)
 
 == Installation ==
 
