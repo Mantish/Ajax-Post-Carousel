@@ -1,6 +1,6 @@
 .apc_out_container{position:relative; padding:0 20px; margin:0;}
-.apc_visible_container{overflow:hidden; position:relative; margin:0; padding:0;}
-.apc_list{overflow:hidden; position:relative; list-style-type:none; margin:0; padding:0;}
+.apc_visible_container{position:relative; margin:0; padding:0;}
+.apc_list{overflow:hidden; list-style-type:none;}
 .apc_item{list-style:none; float:left; display:inline; margin:0 5px; padding:0;}
 .apc_thumb{vertical-align:top;}
 

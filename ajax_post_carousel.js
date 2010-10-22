@@ -14,7 +14,8 @@ var visible_container = new Array();
 var list_offset = new Array();
 
 jQuery(function()
-{
+{	
+	setUpStyles();
 	setUpContainers();
 });
 
@@ -45,13 +46,23 @@ function setUpContainers()
 		//list_offset is the number of items that are slided to the left
 		list_offset[i] = 0;
 		
-		//the outer container and the visible container shoud have the same width, which is the number of visible items * width of each item(including margin), plus the margin of the ul id exist
-		var ul_margins = parseInt(list[i].css('margin-left'));
-		var visible_width = visible_num[i] * items[i].outerWidth(true) + ul_margins;
+		var visible_width = visible_num[i] * items[i].outerWidth(true);
 		visible_container[i].width(visible_width);
-		jQuery(this).width(visible_width);
+		
+		jQuery(this).width(visible_container[i].outerWidth(true));
 		
 		setUpArrows(i);
+	});
+}
+
+function setUpStyles(){
+	jQuery('.apc_visible_container').css({
+		'overflow' : 'hidden'
+	});
+	jQuery('.apc_list').css({
+		'margin' : 0,
+		'padding' : 0,
+		'position' : 'relative'
 	});
 }
 

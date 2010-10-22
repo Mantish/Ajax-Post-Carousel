@@ -3,7 +3,7 @@ Contributors: Mantish - 8manos
 Tags: AJAX, slide, slider, carousel, jquery, post carousel, ajax carousel
 Requires at least: 2.9
 Tested up to: 3.0.1
-Stable tag: 0.2.2
+Stable tag: 0.2.3
 
 Widget that displays posts as a carousel, using jQuery. It preloads a few posts and Ajax is used to load more posts as the carousel advances.
 

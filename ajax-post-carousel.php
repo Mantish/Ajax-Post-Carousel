@@ -3,7 +3,7 @@
 Plugin Name: Ajax Post Carousel
 Plugin URI: http://
 Description: Widget that displays posts as a carousel using jQuery for animations. The widget only preloads a few posts and Ajax is used to load more as the carousel advances (this is very useful when you have hundreds of posts).
-Version: 0.2.2
+Version: 0.2.3
 Author: Mantish - 8manos
 Author URI: http://codigoweb.co
 */
@@ -40,7 +40,7 @@ class Ajax_Post_Carousel extends WP_Widget{
 		echo $before_title . $title . $after_title;
 		?>
 		<div class="apc_out_container">
-			<div class="apc_arrow apc_prev">&larr;</div>
+			<div class="apc_arrow apc_prev apc_inactive">&larr;</div>
 			<div class="apc_visible_container">
 				<ul class="apc_list">
 				<?php
@@ -90,7 +90,7 @@ class Ajax_Post_Carousel extends WP_Widget{
 				?>
 				</ul>
 			</div>
-			<div class="apc_arrow apc_next">&rarr;</div>
+			<div class="apc_arrow apc_next apc_inactive">&rarr;</div>
 			<input type="hidden" value="<?=$visible_posts?>,<?=$init_posts?>,<?=$total_posts?>,<?=$offset?>,<?=get_bloginfo('url')?>,<?=$show_title?>,<?=$post_type?>,<?=$category?>" class="apc_carousel_vars">
 			<?php
 			foreach ($taxonomies as $tax){
