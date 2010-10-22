@@ -4,11 +4,12 @@ Plugin Name: Ajax Post Carousel
 Plugin URI: http://
 Description: Widget that displays posts as a carousel using jQuery for animations. The widget only preloads a few posts and Ajax is used to load more as the carousel advances (this is very useful when you have hundreds of posts).
 Version: 0.2.2
-Author: Mauricio Mantilla - 8manos
+Author: Mantish - 8manos
 Author URI: http://codigoweb.co
 */
 
 //error_reporting(E_ALL);
+
 add_action('template_redirect', array('Ajax_Post_Carousel', 'add_scripts'));
 add_action("widgets_init", array('Ajax_Post_Carousel', 'register'));
 //AJAX
