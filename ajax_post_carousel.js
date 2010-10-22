@@ -46,7 +46,7 @@ function setUpContainers()
 		list_offset[i] = 0;
 		
 		//the outer container and the visible container shoud have the same width, which is the number of visible items * width of each item(including margin), plus the margin of the ul id exist
-		var ul_margins = Number(list[i].css('marginLeft').substr(0, list[i].css('marginLeft') - 2)) + Number(list[i].css('marginRight').substr(0, list[i].css('marginRight') - 2));
+		var ul_margins = parseInt(list[i].css('margin-left'));
 		var visible_width = visible_num[i] * items[i].outerWidth(true) + ul_margins;
 		visible_container[i].width(visible_width);
 		jQuery(this).width(visible_width);
