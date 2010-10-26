@@ -37,14 +37,17 @@ Send us your comments to plugins@8manos.com
 
 == Frequently Asked Questions ==
 
-= How can you not hava FAQ? =
+= How can you not have FAQ? =
 
 This is the first public release, we welcome you to send us your comments and feedback and don't encourage production use without testing.
+
+= Where can I send you feedback =
+
+plugins@8manos.com 
 
 == Screenshots ==
 
 1. This is default output of the plugin, you can customize it as much as you want using CSS. You will also find useful settings in the widget itself.
-
 
 == Upgrade Notice ==
 
