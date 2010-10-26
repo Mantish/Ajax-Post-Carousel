@@ -55,7 +55,6 @@ plugins@8manos.com
 
 Latest release has better css, and no-js fallback.
 
-
 == Changelog ==
 
 = 0.2.3 =
