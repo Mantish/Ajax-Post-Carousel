@@ -1,5 +1,6 @@
 === Ajax Post Carousel ===
 Contributors: Mantish - 8manos < plugins@8manos.com >
+Donate link: http://8manos.com/
 Tags: AJAX, slide, slider, carousel, jquery, post carousel, ajax carousel
 Requires at least: 2.9
 Tested up to: 3.0.1
@@ -14,6 +15,7 @@ With Ajax Post Carousel you can display posts as a carousel using jQuery for ani
 The featured thumbnail of each post is used for the carousel, so at least Wordpress 2.9 is required. The widget can be totally customized using CSS. Only the basic styles are defined so the carousel works properly.
 
 **Features**
+
 * Posts can be selected from a category, a custom taxonomy or a post type.
 * Number of posts in carousel and number of preloaded posts (buffered posts)
 * Posts can be loaded in radom order or using the deafault order (From most recent to oldest)
@@ -31,17 +33,40 @@ Our initial intention is to gather feedback and collaboration.
 
 After testing and approval the plugin will launch oficially.
 
+== Frequently Asked Questions ==
+
+= How can you not hava FAQ? =
+
+This is the first public release, we welcome you to send us your comments and feedback and don't encourage production use without testing.
+
+== Screenshots ==
+
+1. This is default output of the plugin, you can customize it as much as you want using CSS. You will also find useful settings in the widget itself.
+
+
+== Upgrade Notice ==
+
+= 0.2.3 =
+Latest release has better css, and no-js fallback.
+
 
 == Changelog ==
 
+= 0.2.3 =
+* Now has a good fallback when JS is disabled. Styles are more robust
+
 = 0.2.2 =
-*Fixed bug when all post types and all categories are selected.
+
+* Fixed bug when all post types and all categories are selected.
 
 = 0.2.1 =
-*Fixed some bugs in Internet Eplorer and Google Chrome.
+
+* Fixed some bugs in Internet Eplorer and Google Chrome.
 
 = 0.2 =
-*Posts can be selected from a category, a custom taxonomy or a post type.
+
+* Posts can be selected from a category, a custom taxonomy or a post type.
 
 = 0.1 =
+
 * First working version.
