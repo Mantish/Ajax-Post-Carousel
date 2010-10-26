@@ -52,11 +52,16 @@ plugins@8manos.com
 
 == Upgrade Notice ==
 
-= 0.2.3 =
+= 0.2.4 =
 
-Latest release has better css, and no-js fallback.
+New feature, and bug fix.
 
 == Changelog ==
+
+= 0.2.4 =
+
+* New feature: loop
+* Width bug in chrome resolved.
 
 = 0.2.3 =
 
