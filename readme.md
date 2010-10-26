@@ -33,6 +33,8 @@ Our initial intention is to gather feedback and collaboration.
 
 After testing and approval the plugin will launch oficially.
 
+Send us your comments to plugins@8manos.com
+
 == Frequently Asked Questions ==
 
 = How can you not hava FAQ? =
@@ -47,12 +49,14 @@ This is the first public release, we welcome you to send us your comments and fe
 == Upgrade Notice ==
 
 = 0.2.3 =
+
 Latest release has better css, and no-js fallback.
 
 
 == Changelog ==
 
 = 0.2.3 =
+
 * Now has a good fallback when JS is disabled. Styles are more robust
 
 = 0.2.2 =
@@ -61,7 +65,7 @@ Latest release has better css, and no-js fallback.
 
 = 0.2.1 =
 
-* Fixed some bugs in Internet Eplorer and Google Chrome.
+* Fixed some bugs in Internet Explorer and Google Chrome.
 
 = 0.2 =
 
