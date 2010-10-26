@@ -1,5 +1,5 @@
 === Ajax Post Carousel ===
-Contributors: Mantish - 8manos
+Contributors: Mantish - 8manos < plugins@8manos.com >
 Tags: AJAX, slide, slider, carousel, jquery, post carousel, ajax carousel
 Requires at least: 2.9
 Tested up to: 3.0.1
@@ -23,6 +23,14 @@ The featured thumbnail of each post is used for the carousel, so at least Wordpr
 1. Upload `ajax-post-carousel` folder to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Create widgets anywhere, using the 'Widgets' menu in WordPress
+
+== BETA ==
+
+Be adviced we are releasing this software as beta software.
+Our initial intention is to gather feedback and collaboration.
+
+After testing and approval the plugin will launch oficially.
+
 
 == Changelog ==
 
