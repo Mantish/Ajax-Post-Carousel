@@ -8,6 +8,7 @@ var show_title = new Array();
 var post_type = new Array();
 var category = new Array();
 var tax_filters = new Array();
+var loop = new Array();
 var items = new Array();
 var list = new Array();
 var visible_container = new Array();
@@ -28,9 +29,10 @@ function setUpContainers()
 		total_items[i] = Number(carousel_vars[2]);
 		initial_offset[i] = Number(carousel_vars[3]);
 		blog_url = carousel_vars[4];
-		show_title[i] = carousel_vars[5];
-		post_type[i] = carousel_vars[6];
-		category[i] = carousel_vars[7];
+		show_title[i] = carousel_vars[5];		
+		loop[i] = carousel_vars[6];
+		post_type[i] = carousel_vars[7];
+		category[i] = carousel_vars[8];
 		
 		//get the taxonomy filters if available
 		saveTaxFilters(jQuery(this), i);
@@ -49,7 +51,7 @@ function setUpContainers()
 		var visible_width = visible_num[i] * items[i].outerWidth(true);
 		visible_container[i].width(visible_width);
 		
-		jQuery(this).width(visible_container[i].outerWidth(true));
+		jQuery(this).width(visible_width);
 		
 		setUpArrows(i);
 	});
@@ -95,16 +97,16 @@ if ( ! jQuery(this).hasClass('apc_inactive')){
 	}
 	
 	//if there are items ready, animate and then bring more items if needed
-	if (items[i].length > new_list_offset){
+	if (items[i].length > new_list_offset && new_list_offset >= 0){
 		
-		//if more are needed: there are more posts available and the number of preloaded items has not been reached
+		//if there are more posts available and the number of preloaded items has not been reached: items have to be loaded (with ajax)
 		var total_needed = new_list_offset + visible_num[i] + preload_num[i];
 		if (items[i].length < total_items[i] && items[i].length < total_needed && ! ajax_processing[i]){
 			var offset = initial_offset[i] + items[i].length;
-			//if we have already reached the end of the posts, then the offset is higher than the total
+			//if the offset is higher than the total, it means that the post array in wordpress has reached the end
 			if (offset >= total_items[i]){
 				offset = offset - total_items[i];
-				//in this case, we should not request more thant the total posts
+				//in this case, we should not request more thant the total posts in wordpress (total_items)
 				var req_num = Math.min(total_needed - items[i].length, total_items[i] - items[i].length);
 			}else{
 				var req_num = total_needed - items[i].length;
@@ -118,9 +120,22 @@ if ( ! jQuery(this).hasClass('apc_inactive')){
 		}else{
 			//only animate the list, as no more items have to be loaded
 			animateList(new_list_offset, i);
+			//if loop is enabled, all items are loaded and the last view is not full (i.e. visible_num=3, total_items=7, new_list_offset=6 -> last view = 1 item)
+			if (loop[i] && items[i].length == total_items[i] && (total_items[i] - new_list_offset < visible_num[i])){
+				completeLastView(new_list_offset, i);
+			}
 		}		
 	}
-	//if there are no items ready, disable arrows, do ajax and then animate
+	//should get here only when loop is enabled
+	else{
+		//when left arrow clicked
+		if (new_list_offset < 0){
+			new_list_offset = total_items[i] + new_list_offset;
+			animateLoopPrev(new_list_offset, i);
+		}else{
+			animateLoop(new_list_offset, i);
+		}
+	}
 }
 }
 
@@ -150,6 +165,7 @@ function updateList(html, i, animate, new_list_offset, total_expected)
 	//append the results of ajax to the list
 	appendItems(html, i);
 	//animation is performed if needed
+	//this is never reached, the ajax request always preloads items, animation is always made onclick
 	if (animate){
 		animateList(new_list_offset, i);
 	}
@@ -176,7 +192,7 @@ function appendItems(html, i)
 	items[i] = list[i].find('.apc_item');
 	
 	var ul_width = items[i].length * items[i].outerWidth(true);
-	list[i].width(ul_width);;
+	list[i].width(ul_width);
 }
 
 function animateList(new_list_offset, i)
@@ -189,41 +205,128 @@ function animateList(new_list_offset, i)
 	updateArrows(i, new_list_offset);
 }
 
+/*Loop functions*/
+function completeLastView(new_list_offset, i)
+{
+	//last_view_items = items missing so the last view is full
+	var last_view_items = visible_num[i] - (total_items[i] - new_list_offset);
+	var first_items = items[i].slice(0, last_view_items).clone();
+	appendItems(first_items, i);
+}
+
+function animateLoop(new_list_offset, i)
+{
+	//put enough items from the beginning, in the end of the list
+	cloneItemsAtRight(new_list_offset, i);
+	
+	//animate as normally
+	var new_left = -1 * items[i].outerWidth(true) * new_list_offset;
+	list[i].animate({left: new_left+'px'}, 600, function(){
+		//at the end of animation, the list is reduced to the original number of items
+		resetList(new_list_offset, i);
+	});
+	
+	//the offset shouldn't be bigger than the number of items (i.e: total_items=7 -> new_offset=8 = offset=1)
+	list_offset[i] = new_list_offset - total_items[i];
+	updateArrows(i, new_list_offset - total_items[i]);
+}
+
+function animateLoopPrev(new_list_offset, i)
+{
+	cloneItemsAtRight(new_list_offset + visible_num[i], i);
+	
+	//the list is moved to the right end, before animation
+	var new_left = -1 * items[i].outerWidth(true) * (new_list_offset + visible_num[i]);
+	list[i].css({
+		'left' : new_left
+	});
+	
+	//animate as normally
+	new_left = -1 * items[i].outerWidth(true) * new_list_offset;
+	list[i].animate({left: new_left+'px'}, 600, function(){
+		//at the end of animation, only the necessary items are left in the list (can be more than the total_items)
+		adjustListSize(new_list_offset, i);
+	});
+	
+	list_offset[i] = new_list_offset;
+	updateArrows(i, new_list_offset);
+}
+
+function cloneItemsAtRight(new_list_offset, i)
+{
+	//offset_items = items in the last view, that are also in the beginning of the list
+	var offset_items = items[i].length - total_items[i];
+	var next_items = items[i].slice(offset_items, visible_num[i]+new_list_offset-items[i].length+offset_items).clone();
+	appendItems(next_items, i);
+}
+
+function resetList(new_list_offset, i)
+{
+	items[i].slice(total_items[i]).remove();
+	items[i] = items[i].slice(0, total_items[i]);
+	
+	var ul_width = total_items[i] * items[i].outerWidth(true);
+	//
+	var new_left = -1 * (new_list_offset - total_items[i]) * items[i].outerWidth(true);
+	
+	list[i].css({
+		'left' : new_left,
+		'width' : ul_width+'px'
+	});
+}
+
+function adjustListSize(new_list_offset, i)
+{
+	//last_view_items = items missing so the last view is full
+	var last_view_items = visible_num[i] - (total_items[i] - new_list_offset);
+	
+	items[i].slice(total_items[i] + last_view_items).remove();
+	items[i] = items[i].slice(0, total_items[i] + last_view_items);
+	
+	var ul_width = (total_items[i] + last_view_items) * items[i].outerWidth(true);
+	list[i].width(ul_width);
+}
+/*End of Loop functions*/
+
 function updateArrows(i, new_list_offset)
 {
 	//first all the arrows are enabled
-	enableArrow(visible_container[i].siblings('.apc_arrow'), i);
+	enableArrow(visible_container[i].siblings('.apc_arrow'));
 		
-	//left arrow is only disabled at the beggining of the list
-	if (new_list_offset == 0){
-		disableArrow(visible_container[i].siblings(".apc_prev"), i);
+	//left arrow is only disabled at the beggining of the list.
+	//It isn't disabled if loop is on and all items have been loaded
+	if (new_list_offset <= 0 && ( ! loop[i] || items[i].length < total_items[i] )){
+		disableArrow(visible_container[i].siblings(".apc_prev"));
 	}
-	//right arrow is disabled when there are no more items to the right
-	/*
-	Should it be available even if there are no items to the right? In that case a ajaxloader could be shown meanwhile
-	*/
+	
+	//right arrow is disabled when there are no more items to the right (if an ajax request is pending, then ajaxloader is shown meanwhile
 	if (items[i].length <= new_list_offset + visible_num[i]){
-		disableArrow(visible_container[i].siblings(".apc_next"), i);
+		if (ajax_processing[i]){
+			ajaxArrow(visible_container[i].siblings(".apc_next"));
+		}else if ( ! loop[i]){//right arrow is never disabled when loop is on
+			disableArrow(visible_container[i].siblings(".apc_next"));
+		}
 	}
 }
 
 
-//estas dos funciones hay que cambiarlas, hay que ponerle una clase a la flecha y mostrarla u ocultarla con css
-function enableArrow(arrows, i)
+function enableArrow(arrows)
 {
 	arrows.addClass('apc_active');
 	arrows.removeClass('apc_inactive');
 	arrows.removeClass('apc_ajax');
 }
 
-function disableArrow(arrows, i)
+function ajaxArrow(arrows)
+{	
+	arrows.addClass('apc_ajax');
+	arrows.removeClass('apc_inactive');
+	arrows.removeClass('apc_active');
+}
+
+function disableArrow(arrows)
 {
-	if (ajax_processing[i]){
-		arrows.removeClass('apc_inactive');
-		arrows.addClass('apc_ajax');
-	}else{
-		arrows.addClass('apc_inactive');
-		arrows.removeClass('apc_ajax');
-	}
+	arrows.addClass('apc_inactive');
+	arrows.removeClass('apc_ajax');
 	arrows.removeClass('apc_active');
 }
