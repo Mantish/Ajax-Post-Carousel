@@ -25,12 +25,12 @@ class Ajax_Post_Carousel extends WP_Widget{
 	
 	function widget($args, $instance) {
 		extract($args);
-		//Próximas opciones a incluir: advance onhover
 		$title = apply_filters('widget_title', $instance['title'] );
 		$random = isset($instance['random']) ? $instance['random'] : false;
 		$visible_posts = $instance['visible_posts'];
 		$init_posts = $instance['init_posts'];
 		$show_title = isset($instance['show_title']) ? $instance['show_title'] : false;
+		$show_excerpt = isset($instance['show_excerpt']) ? $instance['show_excerpt'] : false;
 		$loop = isset($instance['loop']) ? $instance['loop'] : false;
 		$post_type = $instance['post_type'];
 		$category = $instance['category'];
@@ -77,7 +77,7 @@ class Ajax_Post_Carousel extends WP_Widget{
 				$get_posts_args['offset'] = $offset;
 				
 				$posts = get_posts($get_posts_args);
-				self::__display_items($posts, $show_title);
+				self::__display_items($posts, $show_title, $show_excerpt);
 				
 				//when the offset is to high and only a few posts (less than init_posts) are displayed, we have to get some more
 				$new_offset = $offset + $init_posts;
@@ -86,13 +86,13 @@ class Ajax_Post_Carousel extends WP_Widget{
 					$get_posts_args['numberposts'] = min($new_offset - $total_posts, $offset);
 					$get_posts_args['offset'] = 0;
 					$posts = get_posts($get_posts_args);
-					self::__display_items($posts, $show_title);
+					self::__display_items($posts, $show_title, $show_excerpt);
 				}
 				?>
 				</ul>
 			</div>
 			<div class="apc_arrow apc_next apc_inactive">&rarr;</div>
-			<input type="hidden" value="<?=$visible_posts?>,<?=$init_posts?>,<?=$total_posts?>,<?=$offset?>,<?=get_bloginfo('url')?>,<?=$show_title?>,<?=$loop?>,<?=$post_type?>,<?=$category?>" class="apc_carousel_vars">
+			<input type="hidden" value="<?=$visible_posts?>,<?=$init_posts?>,<?=$total_posts?>,<?=$offset?>,<?=get_bloginfo('url')?>,<?=$show_title?>,<?=$show_excerpt?>,<?=$loop?>,<?=$post_type?>,<?=$category?>" class="apc_carousel_vars">
 			<?php
 			foreach ($taxonomies as $tax){
 				if ($instance[$tax->query_var] != 'all'){
@@ -145,12 +145,9 @@ class Ajax_Post_Carousel extends WP_Widget{
 		return $wpdb->get_var($SQL);		
 	}
 	
-	function __display_items($posts, $show_title){
+	function __display_items($posts, $show_title, $show_excerpt){
 		foreach ($posts as $post){
 			echo '<li class="apc_item"><a title="'.$post->post_title.'" href="'.get_permalink($post->ID).'" class="apc_post_link">';
-			if ( $show_title ){
-				echo '<h5>'.$post->post_title.'</h5>';
-			}
 			if ( (function_exists('has_post_thumbnail')) && (has_post_thumbnail($post->ID)) ){
 				echo get_the_post_thumbnail($post->ID, 'thumbnail', array('class' => 'apc_thumb', 'title' => $post->post_title, 'alt' => $post->post_excerpt));
 			}else{
@@ -158,7 +155,15 @@ class Ajax_Post_Carousel extends WP_Widget{
 				$h = get_option('thumbnail_size_h');
 				echo '<img src="http://dummyimage.com/'.$w.'x'.$h.'/000/fff.jpg&text='.str_replace(' ', '+', $post->post_title).'" class="apc_thumb" title="'.$post->post_title.'" alt="'. $post->post_excerpt.'" width="'.$w.'" height="'.$h.'">';
 			}
-			echo '</a></li>';
+			echo '</a>';
+			if ( $show_title ){
+				echo '<h5><a title="'.$post->post_title.'" href="'.get_permalink($post->ID).'">'.$post->post_title.'</a></h5>';
+			}
+			if ( $show_excerpt ){
+				echo '<p>';
+				echo apply_filters('get_the_excerpt', $post->post_excerpt);
+				echo ' <a title="'.$post->post_title.'" href="'.get_permalink($post->ID).'" class="more-link">[+]</a></p>';
+			}
 		}
 	}
 	
@@ -185,6 +190,7 @@ class Ajax_Post_Carousel extends WP_Widget{
 			$instance['init_posts'] = $init_posts;
 		}
 		$instance['show_title'] = filter_var($new_instance['show_title'], FILTER_VALIDATE_BOOLEAN);
+		$instance['show_excerpt'] = filter_var($new_instance['show_excerpt'], FILTER_VALIDATE_BOOLEAN);
 		$instance['loop'] = filter_var($new_instance['loop'], FILTER_VALIDATE_BOOLEAN);
 		$instance['post_type'] = filter_var(strip_tags($new_instance['post_type']), FILTER_SANITIZE_STRING);
 		$instance['category'] = filter_var(strip_tags($new_instance['category']), FILTER_SANITIZE_STRING);
@@ -198,7 +204,7 @@ class Ajax_Post_Carousel extends WP_Widget{
 	}
 	
 	function form($instance){
-		$defaults = array('title' => 'Previous Posts', 'random' => false, 'visible_posts' => 3, 'init_posts' => 9, 'show_title' => false, 'loop' => false, 'post_type' => 'post', 'category' => 'all');
+		$defaults = array('title' => 'Previous Posts', 'random' => false, 'visible_posts' => 3, 'init_posts' => 9, 'show_title' => false, 'show_excerpt' => false, 'loop' => false, 'post_type' => 'post', 'category' => 'all');
 		$instance = wp_parse_args((array) $instance, $defaults);
 		?>
 		<p><label>Widget title <input name="<?=$this->get_field_name('title')?>" type="text" value="<?=$instance['title']?>" /></label></p>
@@ -206,6 +212,7 @@ class Ajax_Post_Carousel extends WP_Widget{
 		<p><label>Number of visible posts <input name="<?=$this->get_field_name('visible_posts')?>" type="text" value="<?=$instance['visible_posts']?>" /></label></p>
 		<p><label>Number of posts preloaded <input name="<?=$this->get_field_name('init_posts')?>" type="text" value="<?=$instance['init_posts']?>" /></label></p>
 		<p><label>Show post title <input name="<?=$this->get_field_name('show_title')?>" type="checkbox" <?php echo ($instance['show_title'] == true) ? 'checked="checked" ' : ''; ?>/></label></p>
+		<p><label>Show post excerpt <input name="<?=$this->get_field_name('show_excerpt')?>" type="checkbox" <?php echo ($instance['show_excerpt'] == true) ? 'checked="checked" ' : ''; ?>/></label></p>
 		<p><label>Loop (circular carousel) <input name="<?=$this->get_field_name('loop')?>" type="checkbox" <?php echo ($instance['loop'] == true) ? 'checked="checked" ' : ''; ?>/></label></p>
 		<p><label>Post type <select name="<?=$this->get_field_name('post_type')?>">
 			<option value="all" <?php echo ($instance['post_type'] == 'all') ? 'selected="selected" ' : ''; ?>>all</option>
@@ -274,7 +281,7 @@ class Ajax_Post_Carousel extends WP_Widget{
 			}
 		}
 		$posts = get_posts($get_posts_args);
-		self::__display_items($posts, $_POST['title']);
+		self::__display_items($posts, $_POST['title'], $_POST['excerpt']);
 	
 		// IMPORTANT: don't forget to "exit"
 		exit;
