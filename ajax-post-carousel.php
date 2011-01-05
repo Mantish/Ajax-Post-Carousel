@@ -8,7 +8,7 @@ Author: Mantish - 8manos
 Author URI: http://codigoweb.co
 */
 
-error_reporting(E_ALL);
+//error_reporting(E_ALL);
 
 add_action('template_redirect', array('Ajax_Post_Carousel', 'add_scripts'));
 add_action("widgets_init", array('Ajax_Post_Carousel', 'register'));
