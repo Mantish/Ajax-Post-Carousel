@@ -3,8 +3,8 @@ Contributors: Mantish - 8manos < plugins@8manos.com >
 Donate link: http://8manos.com/
 Tags: AJAX, slide, slider, carousel, jquery, post carousel, ajax carousel
 Requires at least: 2.9
-Tested up to: 3.0.1
-Stable tag: 0.2.5
+Tested up to: 3.0.4
+Stable tag: 0.2.6
 
 Widget that displays posts as a carousel, using jQuery. It preloads a few posts and Ajax is used to load more posts as the carousel advances.
 
@@ -17,9 +17,9 @@ The featured thumbnail of each post is used for the carousel, so at least Wordpr
 **Features**
 
 * Posts can be selected from a category, a custom taxonomy or a post type.
-* Number of posts in carousel and number of preloaded posts (buffered posts)
-* Posts can be loaded in radom order or using the deafault order (From most recent to oldest)
-* Carousel can be circular (no start or end)
+* Configurable number of posts in carousel and number of preloaded posts (buffered posts)
+* Posts can be loaded in random order or using the default order (From most recent to oldest)
+* Carousel can be an endless loop
 
 == Installation ==
 
@@ -52,11 +52,16 @@ plugins@8manos.com
 
 == Upgrade Notice ==
 
-= 0.2.5 =
+= 0.2.6 =
 
 Possible Javascript conflicts fixed.
 
 == Changelog ==
+
+= 0.2.6 =
+
+* Fixed misscount when 'all' post types were selected.
+* Commented error_reporting(ALL). No more ugly error messages.
 
 = 0.2.5 =
 
