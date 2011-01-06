@@ -168,7 +168,7 @@
 				//this happens even if the function returns error
 				complete: function(){
 					completeAjax(i, new_list_offset);
-				},
+				}
 			});
 		}
 		
