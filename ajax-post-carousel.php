@@ -11,8 +11,7 @@ Author URI: http://codigoweb.co
 //error_reporting(E_ALL);
 
 //admin menu
-//add_action('admin_menu', array('Ajax_Post_Carousel', 'admin_actions'));  
-
+add_action('admin_menu', array('Ajax_Post_Carousel', 'admin_actions'));  
 //js and css
 add_action('template_redirect', array('Ajax_Post_Carousel', 'add_scripts'));
 //register widget
@@ -318,17 +317,20 @@ class Ajax_Post_Carousel extends WP_Widget{
 	
 	function add_scripts(){
 		wp_enqueue_script('ajax_post_carousel_js', plugins_url('ajax_post_carousel.js', __FILE__), array('jquery'));
-		wp_enqueue_style('ajax_post_carousel_style', plugins_url('ajax_post_carousel.css', __FILE__));
+		//load css if it's checked in admin
+		if (get_option('apc_default_style', 'true') == 'true'){
+			wp_enqueue_style('ajax_post_carousel_style', plugins_url('ajax_post_carousel.css', __FILE__));
+		}
 	}
 	
 	//admin page
-	/*function admin_actions(){
+	function admin_actions(){
 		add_theme_page('Ajax Post Carousel', 'Ajax Post Carousel', 'edit_themes', 'ajax-post-carousel', array('Ajax_Post_Carousel', 'admin_page'));
 	}
 	
 	function admin_page(){
-		echo 'print admin form';
-	}*/
+		include('apc_admin.php');
+	}
 	
 	//AJAX function
 	function ajax_apc_get_posts() {

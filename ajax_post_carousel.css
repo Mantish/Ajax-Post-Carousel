@@ -1,12 +1,35 @@
-.apc_out_container{position:relative; padding:0 20px; margin:0;}
-.apc_visible_container{position:relative; margin:0; padding:0;}
-.apc_list{overflow:hidden; list-style-type:none;}
-.apc_item{list-style:none; float:left; display:inline; margin:0 5px; padding:0;}
-.apc_thumb{vertical-align:top;}
+/*********
+Don't edit this file (ajax_post_carousel.css) directly, as an update wwill override your changes.
+Copy the styles into your theme css file and uncheck the 'use default styles' checkbox in the admin interface
+*********/
 
-.apc_arrow{cursor:pointer; position:absolute; top:10px;}
-.apc_prev{left:5px;}
-.apc_next{right:5px;}
+/****Please don't edit these two lines. Necessary for the carousel to work****/
+
+.apc_visible_container{position:relative;}
+.apc_item{float:left; display:inline;}
+
+/****Be careful when editing the following styles.The arrows may stop working****/
+
+.apc_out_container{position:relative; padding:0 20px;}
+.apc_arrow{cursor:pointer; position:absolute; top:20px;}
+.apc_prev{left:2px;}
+.apc_next{right:2px;}
 .apc_active{display:block;}
 .apc_inactive{display:none;}
-.apc_ajax{display:block; text-indent:-9999px; background:url(ajax-arrow.gif) no-repeat 0 0; width:16px;}
+
+/****Feel free to edit the styles below if you know what you're doing****/
+
+.apc_out_container{margin:0;}
+.apc_visible_container{margin:0; padding:0;}
+.apc_list{overflow:hidden;}
+.apc_item{border:1px solid #666; margin:0 5px; padding:4px;}
+.apc_thumb{vertical-align:top; border:1px solid #999; float:left; display:inline; margin:2px;}
+.apc_item p{clear:both;}
+
+/*make arrows with css borders (doesn't eork for ie6)*/
+.apc_arrow{border-style:solid; width:0; height:0; text-indent:-9999px;}
+.apc_prev{border-width:8px 12px 8px 0; border-color:transparent #446 transparent transparent;}
+.apc_next{border-width:8px 0 8px 12px; border-color:transparent transparent transparent #446;}
+
+/*arrow becomes an indicator when there are posts loading in the background*/
+.apc_ajax{display:block; background:url(ajax-arrow.gif) no-repeat 0 0; width:16px; height:16px; border:none;}

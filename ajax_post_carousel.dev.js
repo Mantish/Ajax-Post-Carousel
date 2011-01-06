@@ -5,7 +5,7 @@
 		var opts = {
 			ajax_processing: new Array(),
 			visible_num: new Array(),
-			preload_num: new Array(),
+			preloaded_num: new Array(),
 			total_items: new Array(),
 			initial_offset: new Array(),
 			blog_url: '',
@@ -40,7 +40,7 @@
 			$('.apc_out_container').each(function(i){
 				var carousel_vars = $(this).children('.apc_carousel_vars').val().split(',');
 				opts.visible_num[i] = Number(carousel_vars[0]);
-				opts.preload_num[i] = Number(carousel_vars[1]) - opts.visible_num[i];
+				opts.preloaded_num[i] = Number(carousel_vars[1])//number of items that should be available (includes the visible ones)
 				opts.total_items[i] = Number(carousel_vars[2]);
 				opts.initial_offset[i] = Number(carousel_vars[3]);
 				opts.blog_url = carousel_vars[4];
@@ -61,6 +61,7 @@
 				//width of the list is just the number of items * width of each item(including margin) (all items should have the same width)
 				var ul_width = opts.items[i].length * opts.items[i].outerWidth(true);
 				opts.list[i].width(ul_width);
+				
 				//list_offset is the number of items that are slided to the left
 				opts.list_offset[i] = 0;
 				
@@ -109,25 +110,24 @@
 			//if there are items ready, animate and then bring more items if needed
 			if (opts.items[i].length > new_list_offset && new_list_offset >= 0){
 				
-				//if there are more posts available and the number of preloaded items has not been reached: load more items with ajax
-				var total_needed = new_list_offset + opts.visible_num[i] + opts.preload_num[i];
+				//if there are posts not loaded yet and the number of preloaded items has not been reached: load more items with ajax
+				var total_needed = new_list_offset + opts.preloaded_num[i];
 				if (opts.items[i].length < opts.total_items[i] && opts.items[i].length < total_needed && ! opts.ajax_processing[i]){
 					
 					//before ajax, turn on the flag so only one ajax call can be made at one time
 					opts.ajax_processing[i] = true;
 					
 					var offset = opts.initial_offset[i] + opts.items[i].length;
-					//if the offset is higher than the total, it means that the post array in wordpress has reached the end
+					//if the offset is higher than the total, it means that the post array returned by wordpress has reached the end
 					if (offset >= opts.total_items[i]){
 						offset = offset - opts.total_items[i];
-						//in this case, we should not request more thant the total posts in wordpress (total_items)
-						var req_num = Math.min(total_needed - opts.items[i].length, opts.total_items[i] - opts.items[i].length);
-					}else{
-						var req_num = total_needed - opts.items[i].length;
 					}
-					//then perform the animation
+					//we should request only as many as to complete the total_items
+					var req_num = Math.min(total_needed - opts.items[i].length, opts.total_items[i] - opts.items[i].length);				
+					
+					//perform the animation
 					animateList(new_list_offset, i);
-					//and perform the ajax request
+					//and then perform the ajax request
 					getNewItems(offset, req_num, i, false, new_list_offset);
 				}else{
 					//only animate the list, as no more items have to be loaded
@@ -163,7 +163,7 @@
 				url: opts.blog_url + '/wp-admin/admin-ajax.php',
 				data: data_query,
 				success: function(response){
-					updateList(response, i, animate, new_list_offset, offset + num);
+					updateList(response, i, animate, new_list_offset, opts.items[i].length + num);
 				},
 				//this happens even if the function returns error
 				complete: function(){
@@ -184,9 +184,9 @@
 			
 			var items_num = opts.items[i].length;
 			//if we didn't get enough posts, we have to make another ajax request
-			if (total_expected > items_num && opts.initial_offset[i] > 0){
-				var new_req_num = Math.min(total_expected - items_num, opts.initial_offset[i]);
+			if (total_expected > items_num){
 				opts.ajax_processing[i] = true;
+				var new_req_num = total_expected - items_num;
 				getNewItems(0, new_req_num, i, animate, new_list_offset);
 			}
 		}
