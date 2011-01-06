@@ -10,8 +10,15 @@ Author URI: http://codigoweb.co
 
 //error_reporting(E_ALL);
 
+//admin menu
+//add_action('admin_menu', array('Ajax_Post_Carousel', 'admin_actions'));  
+
+//js and css
 add_action('template_redirect', array('Ajax_Post_Carousel', 'add_scripts'));
+//register widget
 add_action("widgets_init", array('Ajax_Post_Carousel', 'register'));
+//register shortcode
+add_shortcode('apc-carousel', array('Ajax_Post_Carousel', 'shortcode'));
 //AJAX
 add_action( 'wp_ajax_nopriv_ajax_apc_get_posts', array('Ajax_Post_Carousel', 'ajax_apc_get_posts') );
 add_action( 'wp_ajax_ajax_apc_get_posts', array('Ajax_Post_Carousel', 'ajax_apc_get_posts') );
@@ -21,6 +28,97 @@ class Ajax_Post_Carousel extends WP_Widget{
 		$widget_ops = array('classname' => 'apc_widget', 'description' => 'Widget that displays posts as a carousel using jQuery for animations.');
 		$control_ops = array( 'id_base' => 'ajax-post-carousel' );
 		$this->WP_Widget( 'ajax-post-carousel', 'Ajax Post Carousel', $widget_ops, $control_ops );
+	}
+	
+	function show_carousel($random=0, $visible_posts=3, $init_posts=9, $show_title=0, $show_excerpt=0, $loop=0, $post_type='post', $category='all', $tax_filter=''){
+		$output =
+		'<div class="apc_out_container">
+			<div class="apc_arrow apc_prev apc_inactive">&larr;</div>
+			<div class="apc_visible_container">
+				<ul class="apc_list">';
+		//array for get_posts function
+		$get_posts_args = array();
+		
+		//array of requested taxonomies, to be used in count function
+		$taxonomies_for_count = array();
+		if ($tax_filter){
+			//get the taxonomies requested by the user
+			$tax_filter_array = explode("&", $tax_filter);
+			foreach ($tax_filter_array as $tax){
+				$tax_slug = strtok($tax, '=');
+				$term = strtok('=');
+				
+				$get_posts_args[$tax_slug] = $term;
+				$taxonomies_for_count[] = $term;
+			}
+		}
+			
+		//if post type and category, then added to the args of get_post function 
+		if ($post_type == 'all'){
+			$get_posts_args['post_type'] = 'any';
+		}else{
+			$get_posts_args['post_type'] = $post_type;
+		}
+		if ($category != 'all'){
+			$get_posts_args['category_name'] = $category;
+		}				
+		
+		//before random, have to get total posts
+		$total_posts = self::__apc_count_posts($post_type, $category, $taxonomies_for_count);
+		
+		if ( $random ){
+			$offset = mt_rand(0, $total_posts - 1);
+		}else{
+			$offset = 0;
+		}
+		$get_posts_args['numberposts'] = $init_posts;
+		$get_posts_args['offset'] = $offset;
+		
+		//print_r($get_posts_args);
+		$posts = get_posts($get_posts_args);
+		$output .= self::__display_items($posts, $show_title, $show_excerpt);
+		
+		//when the offset is to high and only a few posts (less than init_posts) are displayed, we have to get some more
+		$new_offset = $offset + $init_posts;
+		if ( $new_offset > $total_posts && $offset > 0 ){
+			//shows all the posts needed to complete the init_posts number, but shouldn't repeat the ones already shown
+			$get_posts_args['numberposts'] = min($new_offset - $total_posts, $offset);
+			$get_posts_args['offset'] = 0;
+			$posts = get_posts($get_posts_args);
+			$output .= self::__display_items($posts, $show_title, $show_excerpt);
+		}
+		$output .=
+			'</ul>
+		</div>
+		<div class="apc_arrow apc_next apc_inactive">&rarr;</div>
+		<input type="hidden" value="'.$visible_posts.','.$init_posts.','.$total_posts.','.$offset.','.get_bloginfo('url').','.$show_title.','.$show_excerpt.','.$loop.','.$post_type.','.$category.','.$tax_filter.'" class="apc_carousel_vars">
+	</div>';
+		
+		return $output;
+	}
+	
+	function shortcode($args){
+		extract(shortcode_atts(array(
+			'random' => 0,
+			'visible_posts' => 3,
+			'init_posts' => 9,
+			'show_title' => 0,
+			'show_excerpt' => 0,
+			'loop' => 0,
+			'post_type' => 'post',
+			'category' => 'all',
+			), $args));
+						
+		$taxonomies = get_taxonomies(array('_builtin' => false), 'objects');
+		$tax_filter = '';
+		foreach ($taxonomies as $tax){
+			if (isset($args[$tax->query_var])){
+				$tax_filter .= '&'.$tax->query_var.'='.$args[$tax->query_var];
+			}
+		}
+		$tax_filter = substr($tax_filter, 1);
+			
+		return self::show_carousel($random, $visible_posts, $init_posts, $show_title, $show_excerpt, $loop, $post_type, $category, $tax_filter);
 	}
 	
 	function widget($args, $instance) {
@@ -34,75 +132,21 @@ class Ajax_Post_Carousel extends WP_Widget{
 		$loop = isset($instance['loop']) ? $instance['loop'] : false;
 		$post_type = $instance['post_type'];
 		$category = $instance['category'];
-				
-		$taxonomies = get_taxonomies(array('_builtin' => false), 'objects');
 		
 		echo $before_widget;
 		echo $before_title . $title . $after_title;
-		?>
-		<div class="apc_out_container">
-			<div class="apc_arrow apc_prev apc_inactive">&larr;</div>
-			<div class="apc_visible_container">
-				<ul class="apc_list">
-				<?php
-				//array for get_posts function
-				$get_posts_args = array();
-				//array of requested taxonomies, to be used in count function
-				$taxonomies_for_count = array();
-				foreach ($taxonomies as $tax){
-					if ($instance[$tax->query_var] != 'all'){
-						$get_posts_args[$tax->query_var] = $instance[$tax->query_var];
-						$taxonomies_for_count[] = $instance[$tax->query_var];
-					}
-				}
-				//if post type and category, then added to the args of get_post function 
-				if ($post_type == 'all'){
-					$get_posts_args['post_type'] = 'any';
-				}else{
-					$get_posts_args['post_type'] = $post_type;
-				}
-				if ($category != 'all'){
-					$get_posts_args['category_name'] = $category;
-				}				
-				
-				//before random, have to get total posts
-				$total_posts = self::__apc_count_posts($post_type, $category, $taxonomies_for_count);
-				
-				if ( $random ){
-					$offset = mt_rand(0, $total_posts - 1);
-				}else{
-					$offset = 0;
-				}
-				$get_posts_args['numberposts'] = $init_posts;
-				$get_posts_args['offset'] = $offset;
-				
-				$posts = get_posts($get_posts_args);
-				self::__display_items($posts, $show_title, $show_excerpt);
-				
-				//when the offset is to high and only a few posts (less than init_posts) are displayed, we have to get some more
-				$new_offset = $offset + $init_posts;
-				if ( $new_offset > $total_posts && $offset > 0 ){
-					//shows all the posts needed to complete the init_posts number, but shouldn't repeat the ones already shown
-					$get_posts_args['numberposts'] = min($new_offset - $total_posts, $offset);
-					$get_posts_args['offset'] = 0;
-					$posts = get_posts($get_posts_args);
-					self::__display_items($posts, $show_title, $show_excerpt);
-				}
-				?>
-				</ul>
-			</div>
-			<div class="apc_arrow apc_next apc_inactive">&rarr;</div>
-			<input type="hidden" value="<?=$visible_posts?>,<?=$init_posts?>,<?=$total_posts?>,<?=$offset?>,<?=get_bloginfo('url')?>,<?=$show_title?>,<?=$show_excerpt?>,<?=$loop?>,<?=$post_type?>,<?=$category?>" class="apc_carousel_vars">
-			<?php
-			foreach ($taxonomies as $tax){
-				if ($instance[$tax->query_var] != 'all'){
-					$get_posts_args[$tax->query_var] = $instance[$tax->query_var];
-					echo '<input type="hidden" value="'.$instance[$tax->query_var].'" class="apc_tax_filter '.$tax->query_var.'">';
-				}
+		
+		$taxonomies = get_taxonomies(array('_builtin' => false), 'objects');
+		$tax_filter = '';
+		foreach ($taxonomies as $tax){
+			if ($instance[$tax->query_var] != 'all'){
+				$tax_filter .= '&'.$tax->query_var.'='.$instance[$tax->query_var];
 			}
-			?>
-		</div>
-		<?php
+		}
+		$tax_filter = substr($tax_filter, 1);
+		
+		echo $this->show_carousel($random, $visible_posts, $init_posts, $show_title, $show_excerpt, $loop, $post_type, $category, $tax_filter);
+		
 		echo $after_widget;
 	}
 	
@@ -111,7 +155,7 @@ class Ajax_Post_Carousel extends WP_Widget{
 		if ($category != 'all'){
 			$taxonomies_for_count[] = $category;
 		}
-				
+		
 		global $wpdb;
 		$SQL = "SELECT COUNT(DISTINCT p.ID) FROM $wpdb->posts AS p";
 		foreach($taxonomies_for_count as $key => $termslug){
@@ -146,25 +190,40 @@ class Ajax_Post_Carousel extends WP_Widget{
 	}
 	
 	function __display_items($posts, $show_title, $show_excerpt){
+		$output = '';
 		foreach ($posts as $post){
-			echo '<li class="apc_item"><a title="'.$post->post_title.'" href="'.get_permalink($post->ID).'" class="apc_post_link">';
+			$output .= '<li class="apc_item"><a title="'.$post->post_title.'" href="'.get_permalink($post->ID).'" class="apc_post_link">';
 			if ( (function_exists('has_post_thumbnail')) && (has_post_thumbnail($post->ID)) ){
-				echo get_the_post_thumbnail($post->ID, 'thumbnail', array('class' => 'apc_thumb', 'title' => $post->post_title, 'alt' => $post->post_excerpt));
+				$output .= get_the_post_thumbnail($post->ID, 'thumbnail', array('class' => 'apc_thumb', 'title' => $post->post_title, 'alt' => $post->post_excerpt));
 			}else{
 				$w = get_option('thumbnail_size_w');
 				$h = get_option('thumbnail_size_h');
-				echo '<img src="http://dummyimage.com/'.$w.'x'.$h.'/000/fff.jpg&text='.str_replace(' ', '+', $post->post_title).'" class="apc_thumb" title="'.$post->post_title.'" alt="'. $post->post_excerpt.'" width="'.$w.'" height="'.$h.'">';
+				$output .= '<img src="http://dummyimage.com/'.$w.'x'.$h.'/000/fff.jpg&text='.str_replace(' ', '+', $post->post_title).'" class="apc_thumb" title="'.$post->post_title.'" alt="'. $post->post_excerpt.'" width="'.$w.'" height="'.$h.'">';
 			}
-			echo '</a>';
+			$output .= '</a>';
 			if ( $show_title ){
-				echo '<h5><a title="'.$post->post_title.'" href="'.get_permalink($post->ID).'">'.$post->post_title.'</a></h5>';
+				$output .= '<h5><a title="'.$post->post_title.'" href="'.get_permalink($post->ID).'">'.$post->post_title.'</a></h5>';
 			}
 			if ( $show_excerpt ){
-				echo '<p>';
-				echo apply_filters('get_the_excerpt', $post->post_excerpt);
-				echo ' <a title="'.$post->post_title.'" href="'.get_permalink($post->ID).'" class="more-link">[+]</a></p>';
+				if ( ! $post->post_excerpt){
+					$excerpt_text = strip_shortcodes( $post->post_content );
+					$excerpt_text = apply_filters('the_content', $excerpt_text);
+					$excerpt_text = strip_tags(str_replace(']]>', ']]&gt;', $excerpt_text));
+					$words = preg_split("/[\n\r\t ]+/", $excerpt_text, 56, PREG_SPLIT_NO_EMPTY);
+					if ( count($words) > 55 ) {
+						array_pop($words);
+						$excerpt_text = implode(' ', $words);
+						$excerpt_text = $excerpt_text . ' ...';
+					} else {
+						$excerpt_text = implode(' ', $words);
+					}
+				}else{
+					$excerpt_text = $post->post_excerpt;
+				}
+				$output .= apply_filters('the_excerpt', $excerpt_text.' <a title="'.$post->post_title.'" href="'.get_permalink($post->ID).'" class="more-link">[+]</a>');
 			}
 		}
+		return $output;
 	}
 	
 	function update($new_instance, $old_instance){
@@ -262,6 +321,16 @@ class Ajax_Post_Carousel extends WP_Widget{
 		wp_enqueue_style('ajax_post_carousel_style', plugins_url('ajax_post_carousel.css', __FILE__));
 	}
 	
+	//admin page
+	/*function admin_actions(){
+		add_theme_page('Ajax Post Carousel', 'Ajax Post Carousel', 'edit_themes', 'ajax-post-carousel', array('Ajax_Post_Carousel', 'admin_page'));
+	}
+	
+	function admin_page(){
+		echo 'print admin form';
+	}*/
+	
+	//AJAX function
 	function ajax_apc_get_posts() {
 		$get_posts_args = array(
 			'numberposts' => $_POST['num'],
@@ -281,7 +350,7 @@ class Ajax_Post_Carousel extends WP_Widget{
 			}
 		}
 		$posts = get_posts($get_posts_args);
-		self::__display_items($posts, $_POST['title'], $_POST['excerpt']);
+		echo self::__display_items($posts, $_POST['title'], $_POST['excerpt']);
 	
 		// IMPORTANT: don't forget to "exit"
 		exit;

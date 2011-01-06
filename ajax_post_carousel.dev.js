@@ -51,7 +51,7 @@
 				opts.category[i] = carousel_vars[9];
 				
 				//get the taxonomy filters if available
-				saveTaxFilters($(this), i);
+				saveTaxFilters(carousel_vars[10], i);
 						
 				//get jquery objects for container, ul and list items
 				opts.items[i] = $(this).find('.apc_item');
@@ -73,13 +73,17 @@
 			});
 		}
 		
-		var saveTaxFilters = function(out_container, i)
+		var saveTaxFilters = function(tax_filter, i)
 		{
-			out_container.find('.apc_tax_filter').each(function(){
-				var input_classes = $(this).attr('class').split(/\s+/);
+			if (tax_filter){
 				opts.tax_filters[i] = new Array();
-				opts.tax_filters[i][input_classes[1]] = $(this).val();
-			});
+				var tax_filter_array = tax_filter.split("&");
+				
+				for (x in tax_filter_array){
+					tax_term_array = tax_filter_array[x].split("=");
+					opts.tax_filters[i][tax_term_array[0]] = tax_term_array[1];
+				}
+			}
 		}
 		
 		var setUpArrows = function(i)
@@ -129,13 +133,13 @@
 					//only animate the list, as no more items have to be loaded
 					animateList(new_list_offset, i);
 					//if loop is enabled, all items are loaded and the last view is not full (i.e. visible_num=3, total_items=7, new_list_offset=6 -> last view = 1 item)
-					if (opts.loop[i] && opts.items[i].length == opts.total_items[i] && (opts.total_items[i] - new_list_offset < opts.visible_num[i])){
+					if (opts.loop[i] == 1 && opts.items[i].length == opts.total_items[i] && (opts.total_items[i] - new_list_offset < opts.visible_num[i])){
 						completeLastView(new_list_offset, i);
 					}
 				}		
 			}
 			//only when loop is enabled
-			else if(opts.loop[i]){
+			else if(opts.loop[i] == 1){
 				//when left arrow clicked
 				if (new_list_offset < 0){
 					new_list_offset = opts.total_items[i] + new_list_offset;
@@ -303,7 +307,7 @@
 				
 			//left arrow is only disabled at the beggining of the list.
 			//It isn't disabled if loop is on and all items have been loaded
-			if (new_list_offset <= 0 && ( ! opts.loop[i] || opts.items[i].length < opts.total_items[i] )){
+			if (new_list_offset <= 0 && ( opts.loop[i] != 1 || opts.items[i].length < opts.total_items[i] )){
 				disableArrow(opts.visible_container[i].siblings(".apc_prev"));
 			}
 			
@@ -311,7 +315,7 @@
 			if (opts.items[i].length <= new_list_offset + opts.visible_num[i]){
 				if (opts.ajax_processing[i]){
 					ajaxArrow(opts.visible_container[i].siblings(".apc_next"));
-				}else if ( ! opts.loop[i]){//right arrow is never disabled when loop is on
+				}else if ( opts.loop[i] != 1){//right arrow is never disabled when loop is on
 					disableArrow(opts.visible_container[i].siblings(".apc_next"));
 				}
 			}
