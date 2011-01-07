@@ -50,7 +50,9 @@ This is the easiest way to add carousels to your site. Just drag the "Ajax Post 
 = Shortcode =
 
 You can use it to include carousels in your posts or pages. Add [apc-carousel] to use the default values.
+
 All the options in the widget can also be used with the shortcode:
+
 * random: Accepts 0 or 1. (default 0)
 * visible_posts: Number of posts visible in the carousel. (default 3)
 * init_posts: Number of preloaded posts. Equals number of visible posts + number of posts in the background. (default 9)
@@ -62,20 +64,25 @@ All the options in the widget can also be used with the shortcode:
 * Posts can be filtered by taxonomy using: taxonomy-slug=term-slug
 
 Example:
+
 [apc-carousel visible_posts=2 init_posts=8 show_title=1 show_excerpt=1 my-taxonomy=my-taxonomy-term]
 
 = PHP Function =
 
 The PHP function can be used in a theme template. The options and defaults are the same of the Shortcode:
+
 Ajax_Post_Carousel::show_carousel($random=0, $visible_posts=3, $init_posts=9, $show_title=0, $show_excerpt=0, $loop=0, $post_type='post', $category='all', $tax_filter='')
+
 $tax_filter uses this format: 'my-tax-1=my-term-1&my-tax-2=my-term-2'
 
 Example that returns the same output as the Shortcode example:
+
 <?php echo Ajax_Post_Carousel::show_carousel(0, 2, 8, 1, 1, 0, 'post', 'all', 'my-taxonomy=my-taxonomy-term'); ?>
 
 = Use your own CSS =
 
 This is the correct way to style the carousels using your own css.
+
 1. Copy the contents of wp-content/plugins/ajax-post-carousel/ajax_post_carousel.css into your theme css file.
 2. Go to Appearance > Ajax Post Carousel in the admin page and uncheck the 'Use default styles' checkbox.
 3. Add, edit or delete rules in your theme css file.
