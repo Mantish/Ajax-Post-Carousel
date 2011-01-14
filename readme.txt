@@ -4,7 +4,7 @@ Donate link: http://8manos.com/
 Tags: AJAX, slide, slider, carousel, jquery, post carousel, ajax carousel
 Requires at least: 2.9
 Tested up to: 3.0.4
-Stable tag: 0.3
+Stable tag: 0.3.1
 
 Widget that displays posts as a carousel, using jQuery. It preloads a few posts and Ajax is used to load more posts as the carousel advances.
 
@@ -17,7 +17,7 @@ The featured thumbnail of each post is used for the carousel, so at least Wordpr
 **Features**
 
 * Posts can be selected from a category, a custom taxonomy or a post type.
-* Configurable number of posts in carousel and number of preloaded posts (buffered posts)
+* Configurable number of posts shown in the carousel and number of preloaded posts (visible posts + posts loaded in the background)
 * Posts can be loaded in random order or using the default order (From most recent to oldest)
 * Carousel can be an endless loop
 * Title and excerpt can be shown. Thumbnail is always shown.
@@ -41,7 +41,7 @@ Send us your comments to plugins@8manos.com
 == HOW TO ==
 
 * Carousels can be added using Widgets, Shortcodes or a PHP function.
-* You can use the default styles included in the plugin or use your own css. Explained below
+* You can use the default styles included in the plugin or use your own css. Explained below.
 
 = Widget =
 
@@ -69,7 +69,7 @@ Example:
 
 = PHP Function =
 
-The PHP function can be used in a theme template. The options and defaults are the same of the Shortcode:
+The PHP function can be used in a theme template. The options and defaults are the same as in the Shortcode:
 
 Ajax_Post_Carousel::show_carousel($random=0, $visible_posts=3, $init_posts=9, $show_title=0, $show_excerpt=0, $loop=0, $post_type='post', $category='all', $tax_filter='')
 
@@ -81,11 +81,10 @@ Example that returns the same output as the Shortcode example:
 
 = Use your own CSS =
 
-This is the correct way to style the carousels using your own css.
+There are to ways to style the carousels using your own css.
 
-1. Copy the contents of wp-content/plugins/ajax-post-carousel/ajax_post_carousel.css into your theme css file.
-2. Go to Appearance > Ajax Post Carousel in the admin page and uncheck the 'Use default styles' checkbox.
-3. Add, edit or delete rules in your theme css file.
+1. Copy the css file from wp-content/plugins/ajax-post-carousel/ajax_post_carousel.css into your theme directory and edit the copy.
+2. Define your own styles in your theme stylesheet. Just use the carousel id, so your rules have a higher priority than the rules from the plugin (for example: #apc_carousel_0 .apc_thumb{border:none;})
 
 == Frequently Asked Questions ==
 
@@ -103,16 +102,20 @@ plugins@8manos.com
 
 == Upgrade Notice ==
 
-= 0.3 =
+= 0.3.1 =
 
 New features as well as some problems fixed.
 
 == Changelog ==
 
+= 0.3.1 =
+
+* Added ID to the carousels and improved the ways that custom styles can be defined.
+
 = 0.3 =
 
 * Carousels can be added using a Shortcode and/or a PHP function.
-* Post escerpts can be included now.
+* Post excerpts can be included now.
 * CSS styles improved so it looks better right out of the box.
 
 = 0.2.6 =

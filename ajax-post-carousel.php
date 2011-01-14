@@ -3,7 +3,7 @@
 Plugin Name: Ajax Post Carousel
 Plugin URI: http://codigoweb.co/wordpress-plugin-ajax-post-carousel/
 Description: Widget that displays posts as a carousel using jQuery for animations. The widget only preloads a few posts and Ajax is used to load more as the carousel advances (this is very useful when you have hundreds of posts).
-Version: 0.3
+Version: 0.3.1
 Author: Mantish - 8manos < plugins@8manos.com >
 Author URI: http://codigoweb.co
 */
@@ -11,7 +11,7 @@ Author URI: http://codigoweb.co
 //error_reporting(E_ALL);
 
 //admin menu
-add_action('admin_menu', array('Ajax_Post_Carousel', 'admin_actions'));  
+//add_action('admin_menu', array('Ajax_Post_Carousel', 'admin_actions'));
 //js and css
 add_action('template_redirect', array('Ajax_Post_Carousel', 'add_scripts'));
 //register widget
@@ -317,20 +317,25 @@ class Ajax_Post_Carousel extends WP_Widget{
 	
 	function add_scripts(){
 		wp_enqueue_script('ajax_post_carousel_js', plugins_url('ajax_post_carousel.js', __FILE__), array('jquery'));
-		//load css if it's checked in admin
-		if (get_option('apc_default_style', 'true') == 'true'){
+		
+		//load css file from the theme folder or the plugin folder
+		if ( file_exists( get_stylesheet_directory()."/ajax_post_carousel.css" ) ) {					
+			wp_enqueue_style( 'ajax_post_carousel_style', get_stylesheet_directory_uri() . '/ajax_post_carousel.css' );					
+		}elseif ( file_exists( get_template_directory()."/ajax_post_carousel.css" ) ) {								
+			wp_enqueue_style( 'ajax_post_carousel_style', get_template_directory_uri() . '/ajax_post_carousel' );		
+		}else{
 			wp_enqueue_style('ajax_post_carousel_style', plugins_url('ajax_post_carousel.css', __FILE__));
 		}
 	}
 	
 	//admin page
-	function admin_actions(){
+	/*function admin_actions(){
 		add_theme_page('Ajax Post Carousel', 'Ajax Post Carousel', 'edit_themes', 'ajax-post-carousel', array('Ajax_Post_Carousel', 'admin_page'));
 	}
 	
 	function admin_page(){
 		include('apc_admin.php');
-	}
+	}*/
 	
 	//AJAX function
 	function ajax_apc_get_posts() {

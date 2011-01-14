@@ -1,6 +1,7 @@
 /*********
-Don't edit this file (ajax_post_carousel.css) directly, as an update wwill override your changes.
-Copy the styles into your theme css file and uncheck the 'use default styles' checkbox in the admin interface
+Don't edit this file (plugins/ajax-post-carousel/ajax_post_carousel.css) directly. If you do, when you update the plugin, it will override your changes.
+Instead, copy this file into your theme directory and edit the copy.
+You can also define your own styles in your theme stylesheet. Just use the carousel id, so your rules have a higher priority than the rules in this file (for example: #apc_carousel_0 .apc_thumb{border:none;})
 *********/
 
 /****Please don't edit these two lines. Necessary for the carousel to work****/
@@ -22,14 +23,14 @@ Copy the styles into your theme css file and uncheck the 'use default styles' ch
 .apc_out_container{margin:0;}
 .apc_visible_container{margin:0; padding:0;}
 .apc_list{overflow:hidden;}
-.apc_item{border:1px solid #666; margin:0 5px; padding:4px;}
-.apc_thumb{vertical-align:top; border:1px solid #999; float:left; display:inline; margin:2px;}
+.apc_item{border:1px solid #666; margin:0 5px; padding:5px;}
+.apc_thumb{vertical-align:top; border:1px solid #999;}
 .apc_item p{clear:both;}
 
-/*make arrows with css borders (doesn't eork for ie6)*/
+/*css arrows using borders (doesn't work for ie6)*/
 .apc_arrow{border-style:solid; width:0; height:0; text-indent:-9999px;}
 .apc_prev{border-width:8px 12px 8px 0; border-color:transparent #446 transparent transparent;}
 .apc_next{border-width:8px 0 8px 12px; border-color:transparent transparent transparent #446;}
 
-/*arrow becomes an indicator when there are posts loading in the background*/
+/*arrow becomes an "loading" indicator when there are posts loading in the background*/
 .apc_ajax{display:block; background:url(ajax-arrow.gif) no-repeat 0 0; width:16px; height:16px; border:none;}

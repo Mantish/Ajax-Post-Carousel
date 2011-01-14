@@ -37,7 +37,9 @@
 		{
 			setUpStyles();
 			
-			$('.apc_out_container').each(function(i){
+			$('.apc_out_container').each(function(i){				
+				$(this).attr('id', 'apc_carousel_'+i);
+				
 				var carousel_vars = $(this).children('.apc_carousel_vars').val().split(',');
 				opts.visible_num[i] = Number(carousel_vars[0]);
 				opts.preloaded_num[i] = Number(carousel_vars[1])//number of items that should be available (includes the visible ones)
