@@ -11,7 +11,7 @@ Requires at least: 2.9
 
 Tested up to: 3.0.4
 
-Stable tag: 0.3.1
+Stable tag: 0.3.2
 
 Widget that displays posts as a carousel, using jQuery. It preloads a few posts and Ajax is used to load more posts as the carousel advances.
 
@@ -116,6 +116,11 @@ plugins@8manos.com
 
 Changelog
 =========
+
+0.3.2
+-----
+
+* Fixed bugs when clicking arrows too fast.
 
 0.3.1
 -----
