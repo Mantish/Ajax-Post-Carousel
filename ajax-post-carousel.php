@@ -190,18 +190,19 @@ class Ajax_Post_Carousel extends WP_Widget{
 	
 	function __display_items($posts, $show_title, $show_excerpt){
 		$output = '';
+		$post_title = get_the_title($post->ID);
 		foreach ($posts as $post){
-			$output .= '<li class="apc_item"><a title="'.$post->post_title.'" href="'.get_permalink($post->ID).'" class="apc_post_link">';
+			$output .= '<li class="apc_item"><a title="'.$post_title.'" href="'.get_permalink($post->ID).'" class="apc_post_link">';
 			if ( (function_exists('has_post_thumbnail')) && (has_post_thumbnail($post->ID)) ){
-				$output .= get_the_post_thumbnail($post->ID, 'thumbnail', array('class' => 'apc_thumb', 'title' => $post->post_title, 'alt' => $post->post_excerpt));
+				$output .= get_the_post_thumbnail($post->ID, 'thumbnail', array('class' => 'apc_thumb', 'title' => $post_title, 'alt' => $post->post_excerpt));
 			}else{
 				$w = get_option('thumbnail_size_w');
 				$h = get_option('thumbnail_size_h');
-				$output .= '<img src="http://dummyimage.com/'.$w.'x'.$h.'/000/fff.jpg&text='.str_replace(' ', '+', $post->post_title).'" class="apc_thumb" title="'.$post->post_title.'" alt="'. $post->post_excerpt.'" width="'.$w.'" height="'.$h.'">';
+				$output .= '<img src="http://dummyimage.com/'.$w.'x'.$h.'/000/fff.jpg&text='.str_replace(' ', '+', $post_title).'" class="apc_thumb" title="'.$post_title.'" alt="'. $post->post_excerpt.'" width="'.$w.'" height="'.$h.'">';
 			}
 			$output .= '</a>';
 			if ( $show_title ){
-				$output .= '<h5><a title="'.$post->post_title.'" href="'.get_permalink($post->ID).'">'.$post->post_title.'</a></h5>';
+				$output .= '<h5><a title="'.$post_title.'" href="'.get_permalink($post->ID).'">'.$post_title.'</a></h5>';
 			}
 			if ( $show_excerpt ){
 				if ( ! $post->post_excerpt){
@@ -219,7 +220,7 @@ class Ajax_Post_Carousel extends WP_Widget{
 				}else{
 					$excerpt_text = $post->post_excerpt;
 				}
-				$output .= apply_filters('the_excerpt', $excerpt_text.' <a title="'.$post->post_title.'" href="'.get_permalink($post->ID).'" class="more-link">[+]</a>');
+				$output .= apply_filters('the_excerpt', $excerpt_text.' <a title="'.$post_title.'" href="'.get_permalink($post->ID).'" class="more-link">[+]</a>');
 			}
 		}
 		return $output;
